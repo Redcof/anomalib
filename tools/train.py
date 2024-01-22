@@ -12,6 +12,7 @@ import logging
 import warnings
 from argparse import ArgumentParser, Namespace
 
+import torch
 from pytorch_lightning import Trainer, seed_everything
 
 from anomalib.config import get_configurable_parameters
@@ -76,4 +77,5 @@ def train(args: Namespace):
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
+    torch.set_float32_matmul_precision('medium')
     train(args)

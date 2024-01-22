@@ -1,3 +1,4 @@
+import argparse
 import os
 import pathlib
 import random
@@ -268,14 +269,52 @@ def parse_voc_xml(xml_path):
     }
 
 
-def classify_files(xml_train, sixray_train_files, anomaly_classes):
+from PIL import Image, ImageDraw
+
+
+def generate_mask_from_bbox(bboxes, image_size) -> Image:
+    # bboxes: [(x_min, y_min, x_max, y_max), ...]
+    # image_size: (width, height)
+    
+    # Create a black image
+    mask = Image.new("L", image_size, 0)
+    draw = ImageDraw.Draw(mask)
+    
+    # Draw a white rectangle (255) on the black image within the bounding box
+    for bbox in bboxes:
+        draw.rectangle(bbox, fill=255)
+    return mask
+
+
+def generate_mask_img(xml_dir, files, output_dir):
+    """
+    Create bounding box mask form given image
+    Args:
+        xml_dir:
+        files:
+
+    Returns:
+
+    """
+    for file in tqdm(files):
+        xml = xml_dir / os.path.basename(file).replace(".jpg", ".xml")
+        xml_data = parse_voc_xml(xml)
+        image_size = xml_data['image']['size']['width'], xml_data['image']['size']['height']
+        # get the classnames
+        bounding_boxes = map(lambda x: (x['xmin'], x['ymin'], x['xmax'], x['ymax']),
+                             ([d["bbox"] for d in xml_data['objects']]))
+        pil_mask_img = generate_mask_from_bbox(bounding_boxes, image_size)
+        pil_mask_img.save(output_dir / os.path.basename(file), format="JPEG")
+
+
+def classify_files(xml_dir, files, anomaly_classes):
     """
     Prepare two dictionaries, for train and test respectively.
     The key to the dictionary is the class names. Each class
     name contains a list of file names.
     Args:
-        xml_train:
-        sixray_train_files:
+        xml_dir:
+        files:
         anomaly_classes:
 
     Returns:
@@ -283,8 +322,8 @@ def classify_files(xml_train, sixray_train_files, anomaly_classes):
     """
     normal_files = defaultdict(lambda: [])
     abnormal_files = defaultdict(lambda: [])
-    for file in tqdm(sixray_train_files):
-        xml = xml_train / os.path.basename(file).replace(".jpg", ".xml")
+    for file in tqdm(files):
+        xml = xml_dir / os.path.basename(file).replace(".jpg", ".xml")
         # get the classnames
         classes = [d["name"] for d in parse_voc_xml(xml)['objects']]
         unique_cls = set(classes)
@@ -298,7 +337,7 @@ def classify_files(xml_train, sixray_train_files, anomaly_classes):
     return normal_files, abnormal_files
 
 
-def copy_sixray_folder_split(sixray_path, anomaly_dataset_path, anomaly_classes):
+def copy_sixray_folder_split(sixray_path, anomaly_dataset_path, anomaly_classes, ablation=0, generate_mask=False):
     """
     This function will copy SIXray images to 'n' folders, where 'n' is number of classes. Each folder will be named
     by the class-name. This kind of structure is compatible with the 'anomalib' library.
@@ -311,6 +350,15 @@ def copy_sixray_folder_split(sixray_path, anomaly_dataset_path, anomaly_classes)
     anomaly_data_dir = pathlib.Path(anomaly_dataset_path)
     sixray_train_files = list(crawl(src_train, ".jpg"))
     sixray_test_files = list(crawl(src_test, ".jpg"))
+    # shuffle
+    random.seed(47)
+    random.shuffle(sixray_train_files)
+    random.seed(47)
+    random.shuffle(sixray_test_files)
+    # ablation
+    if ablation > 0:
+        sixray_train_files = sixray_train_files[:ablation]
+        sixray_test_files = sixray_test_files[:ablation]
     
     xml_train = sixray / "train" / "Annotations"  # contains sixray train annotations xmls
     xml_test = sixray / "test" / "Annotations"  # contains sixray test annotations xmls
@@ -332,6 +380,12 @@ def copy_sixray_folder_split(sixray_path, anomaly_dataset_path, anomaly_classes)
     # copying sixray/train/abnormal images to dataset/test/abnormal dir
     for cls, files in abnormal_test.items():
         copy_files(src_test, list(map(os.path.basename, files)), anomaly_data_dir / "abnormal" / cls)
+    
+    if generate_mask:
+        mask_dir = anomaly_data_dir / "mask"
+        os.makedirs(mask_dir, exist_ok=True)
+        generate_mask_img(xml_train, sixray_train_files, mask_dir)
+        generate_mask_img(xml_test, sixray_test_files, mask_dir)
 
 
 def clean_before_copy(anomaly_dataset_path):
@@ -354,21 +408,47 @@ def copy_sd3_dataset(sd3_path, anomaly_dataset_path):
 
 
 if __name__ == '__main__':
-    sd3_hif_path = r"/data/bags_sd3"
-    sixray_path = r"/data/Sixray_easy"
-    sixray_sd3_anomaly_dataset = r"/data/sixray_sd3_anomaly"
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--export_dir', '-ex', default=r"/data/sixray_sd3_anomaly",
+                        help='Path to output dataset.', required=True)
+    parser.add_argument('--clean', '-c', action='store_true', default=True,
+                        help='Clean directory')
+    parser.add_argument('--generate_mask', '-m', action='store_true', default=False,
+                        help='Generate musk.')
+    parser.add_argument('--sixray_only', '-sixo', action='store_true', default=False,
+                        help='Keep only sixray data')
+    parser.add_argument('--ablation', '-abl', default=0, type=int, help='Number of images to keep for ablation study')
+    parser.add_argument('--sixray_dir', '-sixray', default=r"/data/Sixray_easy", help='Path to SIXray dataset.')
+    parser.add_argument('--anomaly_classes', '-an', default=("gun",), help='Anomaly classes', nargs='+', required=True)
+    parser.add_argument('--combine_hif', '-com', action='store_true', default=False,
+                        help='Combine hif')
+    parser.add_argument('--hif_dir', '-hif', default=r"/data/bags_sd3", help="Path to HIF dir")
+    parser.add_argument('--hif_xml_dir', '-xml', default=None, help="Path to XML dir")
+    parser.add_argument('--drop_hif_percent', default=30,
+                        help="Percent of HIF files to ignore while preparing the dataset")
+    
+    opt = parser.parse_args()
+    
+    sd3_hif_path = opt.hif_dir  # r"/data/bags_sd3"
+    sixray_path = opt.sixray_dir  # r"/data/Sixray_easy"
+    sixray_sd3_anomaly_dataset = opt.export_dir  # r"/data/sixray_sd3_anomaly"
     # sd3_hif_path = r"C:\Users\dndlssardar\OneDrive - Smiths Group\Documents\Projects\annox\example_images"
-    sixray_path = r"C:\Users\dndlssardar\OneDrive - Smiths Group\Documents\Projects\Dataset\Sixray_easy"
-    sixray_sd3_anomaly_dataset = r"C:\Users\dndlssardar\Documents\Projects\Dataset\Sixray_folder"
+    # sixray_path = r"C:\Users\dndlssardar\OneDrive - Smiths Group\Documents\Projects\Dataset\Sixray_easy"
+    # sixray_sd3_anomaly_dataset = r"C:\Users\dndlssardar\Documents\Projects\Dataset\Sixray_folder"
     sd3_img_export_path = os.path.join(sd3_hif_path, "exported")
     all_sixray_classes = ("gun", "knife", "wrench", "pliers", "scissors", "hammer")
-    sixray_anomaly_classes = ("gun",)
-    discard_sd3 = 30 / 100  # 30%
+    sixray_anomaly_classes = tuple(opt.anomaly_classes)
     
-    clean_before_copy(sixray_sd3_anomaly_dataset)
-    # export_sd3_hif_form_dir(sd3_hif_path, sd3_img_export_path, remove_before_export=True)
-    # split_exported_sd3_hif(sd3_img_export_path, .8, discard=discard_sd3)
-    # copy_sd3_dataset(sd3_img_export_path, sixray_sd3_anomaly_dataset)
-    # copy_sixray_easy(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes)
-    copy_sixray_folder_split(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes)
+    if opt.clean:
+        clean_before_copy(sixray_sd3_anomaly_dataset)
+    if opt.combine_hif:
+        discard_sd3 = opt.drop_hif_percent / 100.  # 30%
+        export_sd3_hif_form_dir(sd3_hif_path, sd3_img_export_path, remove_before_export=True)
+        split_exported_sd3_hif(sd3_img_export_path, .8, discard=discard_sd3)
+        copy_sd3_dataset(sd3_img_export_path, sixray_sd3_anomaly_dataset)
+        copy_sixray_easy(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes)
+    elif opt.sixray_only:
+        copy_sixray_folder_split(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes,
+                                 opt.ablation,
+                                 generate_mask=opt.generate_mask)
     print("Process completed.")

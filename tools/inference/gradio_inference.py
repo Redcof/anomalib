@@ -12,9 +12,8 @@ from argparse import ArgumentParser
 from importlib import import_module
 from pathlib import Path
 
+import gradio
 import gradio as gr
-import gradio.inputs
-import gradio.outputs
 import numpy as np
 
 from anomalib.deploy import Inferencer
@@ -36,7 +35,7 @@ def get_parser() -> ArgumentParser:
     parser.add_argument("--weights", type=Path, required=True, help="Path to model weights")
     parser.add_argument("--metadata", type=Path, required=False, help="Path to a JSON file containing the metadata.")
     parser.add_argument("--share", type=bool, required=False, default=False, help="Share Gradio `share_url`")
-
+    
     return parser
 
 
@@ -53,7 +52,7 @@ def get_inferencer(weight_path: Path, metadata: Path | None = None) -> Inference
     Returns:
         Inferencer: Torch or OpenVINO inferencer.
     """
-
+    
     # Get the inferencer. We use .ckpt extension for Torch models and (onnx, bin)
     # for the openvino models.
     extension = weight_path.suffix
@@ -62,20 +61,20 @@ def get_inferencer(weight_path: Path, metadata: Path | None = None) -> Inference
     if extension in (".pt", ".pth", ".ckpt"):
         torch_inferencer = getattr(module, "TorchInferencer")
         inferencer = torch_inferencer(path=weight_path)
-
+    
     elif extension in (".onnx", ".bin", ".xml"):
         if metadata is None:
             raise ValueError("When using OpenVINO Inferencer, the following arguments are required: --metadata")
-
+        
         openvino_inferencer = getattr(module, "OpenVINOInferencer")
         inferencer = openvino_inferencer(path=weight_path, metadata=metadata)
-
+    
     else:
         raise ValueError(
             f"Model extension is not supported. Torch Inferencer exptects a .ckpt file,"
             f"OpenVINO Inferencer expects either .onnx, .bin or .xml file. Got {extension}"
         )
-
+    
     return inferencer
 
 
@@ -98,21 +97,21 @@ def infer(image: np.ndarray, inferencer: Inferencer) -> tuple[np.ndarray, np.nda
 if __name__ == "__main__":
     args = get_parser().parse_args()
     gradio_inferencer = get_inferencer(args.weights, args.metadata)
-
+    
     interface = gr.Interface(
         fn=lambda image: infer(image, gradio_inferencer),
         inputs=[
-            gradio.inputs.Image(
-                shape=None, image_mode="RGB", source="upload", tool="editor", type="numpy", label="Image"
+            gradio.Image(
+                image_mode="RGB", type="numpy", label="Image"
             ),
         ],
         outputs=[
-            gradio.outputs.Image(type="numpy", label="Predicted Heat Map"),
-            gradio.outputs.Image(type="numpy", label="Predicted Mask"),
-            gradio.outputs.Image(type="numpy", label="Segmentation Result"),
+            gradio.Image(type="numpy", label="Predicted Heat Map"),
+            gradio.Image(type="numpy", label="Predicted Mask"),
+            gradio.Image(type="numpy", label="Segmentation Result"),
         ],
         title="Anomalib",
         description="Anomalib Gradio",
     )
-
+    
     interface.launch(share=args.share)
