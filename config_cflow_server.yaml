@@ -41,7 +41,7 @@ model:
   lr: 0.0001
   early_stopping:
     patience: 5
-    metric: image_F1Score
+    metric: image_AUROC
     mode: max
   normalization_method: min_max # options: [null, min_max, cdf]
 
