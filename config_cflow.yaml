@@ -7,7 +7,7 @@ dataset:
   normal_test_dir: null
   extensions: null
   task: classification
-  mask_dir: null # C:\Users\dndlssardar\Documents\Projects\Dataset\Sixray_folder\mask
+  mask_dir: null
   category: gun
   train_batch_size: 6
   eval_batch_size: 6
