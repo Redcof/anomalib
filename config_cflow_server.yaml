@@ -69,15 +69,15 @@ project:
   path: ./results
 
 logging:
-  logger: [ csv, tensorboard ] # options: [comet, tensorboard, wandb, csv] or combinations.
-  log_graph: false # Logs the model graph to respective logger.
+  logger: [csv, tensorboard ] # options: [comet, tensorboard, wandb, csv] or combinations.
+  log_graph: true # Logs the model graph to respective logger.
 
 optimization:
   export_mode: torch # options: torch, onnx, openvino
 
 # PL Trainer Args. Don't add extra parameter here.
 trainer:
-  resume_from_checkpoint: results/cflow/sixray/run/weights/lightning/model-v4.ckpt
+  resume_from_checkpoint: null
   enable_checkpointing: true
   default_root_dir: null
   gradient_clip_val: 0
@@ -90,8 +90,8 @@ trainer:
   check_val_every_n_epoch: 1 # Don't validate before extracting features.
   fast_dev_run: false
   accumulate_grad_batches: 1
-  max_epochs: 100
-  min_epochs: 100
+  max_epochs: 200
+  min_epochs: 200
   max_steps: -1
   min_steps: null
   max_time: null
