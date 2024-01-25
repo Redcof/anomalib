@@ -1,4 +1,4 @@
-# PatchCore
+# PatchCore: Towards Total Recall in Industrial Anomaly Detection
 
 This is the implementation of the [PatchCore](https://arxiv.org/pdf/2106.08265.pdf) paper.
 

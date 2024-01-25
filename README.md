@@ -27,7 +27,8 @@
 
 # 🌟 Upcoming Release: Anomalib v1 🌟
 
-We're excited to announce that Anomalib v1 is on the horizon! This major release packs new features, enhancements, and performance improvements.
+We're excited to announce that Anomalib v1 is on the horizon! This major release packs new features, enhancements, and
+performance improvements.
 
 Get a sneak peek of Anomalib v1:
 
@@ -40,33 +41,46 @@ Get a sneak peek of Anomalib v1:
   ```
 
 - 📘 **Documentation**: Discover the latest additions and enhancements [here](https://anomalib.readthedocs.io/en/v1/).
-- 🧪 **Early Testing**: Help us refine the final release by testing pre-release features and report issues [here](https://github.com/openvinotoolkit/anomalib/issues).
-- 👩‍💻 **Contribute**: Your input is invaluable - Help us make anomalib v1.x even better. Read more about the contribution guidelines [here](https://github.com/openvinotoolkit/anomalib/blob/main/CONTRIBUTING.md)
+- 🧪 **Early Testing**: Help us refine the final release by testing pre-release features and report
+  issues [here](https://github.com/openvinotoolkit/anomalib/issues).
+- 👩‍💻 **Contribute**: Your input is invaluable - Help us make anomalib v1.x even better. Read more about the
+  contribution guidelines [here](https://github.com/openvinotoolkit/anomalib/blob/main/CONTRIBUTING.md)
 
 ---
 
 # Introduction
 
-Anomalib is a deep learning library that aims to collect state-of-the-art anomaly detection algorithms for benchmarking on both public and private datasets. Anomalib provides several ready-to-use implementations of anomaly detection algorithms described in the recent literature, as well as a set of tools that facilitate the development and implementation of custom models. The library has a strong focus on image-based anomaly detection, where the goal of the algorithm is to identify anomalous images, or anomalous pixel regions within images in a dataset. Anomalib is constantly updated with new algorithms and training/inference extensions, so keep checking!
+Anomalib is a deep learning library that aims to collect state-of-the-art anomaly detection algorithms for benchmarking
+on both public and private datasets. Anomalib provides several ready-to-use implementations of anomaly detection
+algorithms described in the recent literature, as well as a set of tools that facilitate the development and
+implementation of custom models. The library has a strong focus on image-based anomaly detection, where the goal of the
+algorithm is to identify anomalous images, or anomalous pixel regions within images in a dataset. Anomalib is constantly
+updated with new algorithms and training/inference extensions, so keep checking!
 
 ![Sample Image](https://raw.githubusercontent.com/openvinotoolkit/anomalib/main/docs/source/images/readme.png)
 
 ## Key features
 
 - The largest public collection of ready-to-use deep learning anomaly detection algorithms and benchmark datasets.
-- [**PyTorch Lightning**](https://www.pytorchlightning.ai/) based model implementations to reduce boilerplate code and limit the implementation efforts to the bare essentials.
-- All models can be exported to [**OpenVINO**](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html) Intermediate Representation (IR) for accelerated inference on intel hardware.
-- A set of [inference tools](#inference) for quick and easy deployment of the standard or custom anomaly detection models.
+- [**PyTorch Lightning**](https://www.pytorchlightning.ai/) based model implementations to reduce boilerplate code and
+  limit the implementation efforts to the bare essentials.
+- All models can be exported to [**OpenVINO
+  **](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html) Intermediate
+  Representation (IR) for accelerated inference on intel hardware.
+- A set of [inference tools](#inference) for quick and easy deployment of the standard or custom anomaly detection
+  models.
 
 ---
 
 # Getting Started
 
-Following is a guide on how to get started with `anomalib`. For more details, look at the [Documentation](https://openvinotoolkit.github.io/anomalib).
+Following is a guide on how to get started with `anomalib`. For more details, look at
+the [Documentation](https://openvinotoolkit.github.io/anomalib).
 
 ## Jupyter Notebooks
 
-For getting started with a Jupyter Notebook, please refer to the [Notebooks](notebooks) folder of this repository. Additionally, you can refer to a few created by the community:
+For getting started with a Jupyter Notebook, please refer to the [Notebooks](notebooks) folder of this repository.
+Additionally, you can refer to a few created by the community:
 
 ## PyPI Install
 
@@ -78,7 +92,8 @@ pip install anomalib
 
 ## Local Install
 
-It is highly recommended to use virtual environment when installing anomalib. For instance, with [anaconda](https://www.anaconda.com/products/individual), `anomalib` could be installed as,
+It is highly recommended to use virtual environment when installing anomalib. For instance,
+with [anaconda](https://www.anaconda.com/products/individual), `anomalib` could be installed as,
 
 ```bash
 yes | conda create -n anomalib_env python=3.10
@@ -91,7 +106,9 @@ pip install -e .
 # Training
 
 By default [`python tools/train.py`](tools/train.py)
-runs [PADIM](https://arxiv.org/abs/2011.08785) model on `leather` category from the [MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) dataset.
+runs [PADIM](https://arxiv.org/abs/2011.08785) model on `leather` category from
+the [MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+dataset.
 
 ```bash
 python tools/train.py    # Train PADIM on MVTec AD leather
@@ -112,7 +129,8 @@ For example, to train [PADIM](src/anomalib/models/padim) you can use
 python tools/train.py --config src/anomalib/models/padim/config.yaml
 ```
 
-Alternatively, a model name could also be provided as an argument, where the scripts automatically finds the corresponding config file.
+Alternatively, a model name could also be provided as an argument, where the scripts automatically finds the
+corresponding config file.
 
 ```bash
 python tools/train.py --model padim
@@ -120,30 +138,33 @@ python tools/train.py --model padim
 
 where the currently available models are:
 
-- [CFA](src/anomalib/models/cfa)
-- [CFlow](src/anomalib/models/cflow)
-- [DFKDE](src/anomalib/models/dfkde)
-- [DFM](src/anomalib/models/dfm)
-- [DRAEM](src/anomalib/models/draem)
-- [DSR](src/anomalib/models/dsr)
-- [EfficientAd](src/anomalib/models/efficient_ad)
-- [FastFlow](src/anomalib/models/fastflow)
-- [GANomaly](src/anomalib/models/ganomaly)
-- [PADIM](src/anomalib/models/padim)
-- [PatchCore](src/anomalib/models/patchcore)
-- [Reverse Distillation](src/anomalib/models/reverse_distillation)
-- [STFPM](src/anomalib/models/stfpm)
-- [UFlow](src/anomalib/models/uflow)
+- 2023 [EfficientAd](src/anomalib/models/efficient_ad/README.md)
+- 2022 [CFA](src/anomalib/models/cfa/README.md)
+- 2022 [DSR](src/anomalib/models/dsr/README.md)
+- 2022 [Reverse Distillation](src/anomalib/models/reverse_distillation/README.md)
+- 2022 [UFlow](src/anomalib/models/uflow/README.md)
+- 2021 [CFlow](src/anomalib/models/cflow/README.md)
+- 2021 [DRAEM](src/anomalib/models/draem/README.md)
+- 2021 [FastFlow](src/anomalib/models/fastflow/README.md)
+- 2021 [PADIM](src/anomalib/models/padim/README.md)
+- 2021 [PatchCore](src/anomalib/models/patchcore/README.md)
+- 2021 [STFPM](src/anomalib/models/stfpm/README.md)
+- 2020 [DFKDE](src/anomalib/models/dfkde/README.md)
+- 2019 [DFM](src/anomalib/models/dfm/README.md)
+- 2018 [GANomaly](src/anomalib/models/ganomaly/README.md)
 
 ## Feature extraction & (pre-trained) backbones
 
-The pre-trained backbones come from [PyTorch Image Models (timm)](https://github.com/rwightman/pytorch-image-models), which are wrapped by `FeatureExtractor`.
+The pre-trained backbones come from [PyTorch Image Models (timm)](https://github.com/rwightman/pytorch-image-models),
+which are wrapped by `FeatureExtractor`.
 
-For more information, please check our documentation or the [section about feature extraction in "Getting Started with PyTorch Image Models (timm): A Practitioner’s Guide"](https://towardsdatascience.com/getting-started-with-pytorch-image-models-timm-a-practitioners-guide-4e77b4bf9055#b83b:~:text=ready%20to%20train!-,Feature%20Extraction,-timm%20models%20also>).
+For more information, please check our documentation or
+the [section about feature extraction in "Getting Started with PyTorch Image Models (timm): A Practitioner’s Guide"](https://towardsdatascience.com/getting-started-with-pytorch-image-models-timm-a-practitioners-guide-4e77b4bf9055#b83b:~:text=ready%20to%20train!-,Feature%20Extraction,-timm%20models%20also>).
 
 Tips:
 
-- Papers With Code has an interface to easily browse models available in timm: [https://paperswithcode.com/lib/timm](https://paperswithcode.com/lib/timm)
+- Papers With Code has an interface to easily browse models available in
+  timm: [https://paperswithcode.com/lib/timm](https://paperswithcode.com/lib/timm)
 
 - You can also find them with the function `timm.list_models("resnet*", pretrained=True)`
 
@@ -158,7 +179,8 @@ model:
 
 ## Custom Dataset
 
-It is also possible to train on a custom folder dataset. To do so, `data` section in `config.yaml` is to be modified as follows:
+It is also possible to train on a custom folder dataset. To do so, `data` section in `config.yaml` is to be modified as
+follows:
 
 <details>
 <summary>Configuration for Custom Dataset</summary>
@@ -198,11 +220,14 @@ dataset:
 
 </details>
 
-By placing the above configuration to the `dataset` section of the `config.yaml` file, the model will be trained on the custom dataset.
+By placing the above configuration to the `dataset` section of the `config.yaml` file, the model will be trained on the
+custom dataset.
 
 # Inference
 
-Anomalib includes multiple inferencing scripts, including Torch, Lightning, Gradio, and OpenVINO inferencers to perform inference using the trained/exported model. In this section, we will go over how to use these scripts to perform inference.
+Anomalib includes multiple inferencing scripts, including Torch, Lightning, Gradio, and OpenVINO inferencers to perform
+inference using the trained/exported model. In this section, we will go over how to use these scripts to perform
+inference.
 
 <details>
 <summary>PyTorch Inference</summary>
@@ -240,7 +265,8 @@ python tools/inference/lightning_inference.py \
 <details>
 <summary>OpenVINO Inference</summary>
 
-To run the OpenVINO inference, you need to first export the PyTorch model to an OpenVINO model. ensure that `export_mode` is set to `"openvino"` in the respective model `config.yaml`.
+To run the OpenVINO inference, you need to first export the PyTorch model to an OpenVINO model. ensure
+that `export_mode` is set to `"openvino"` in the respective model `config.yaml`.
 
 ```yaml
 # Example config.yaml for OpenVINO
@@ -267,7 +293,8 @@ python tools/inference/openvino_inference.py \
 <details>
 <summary>Gradio Inference</summary>
 
-You can also use Gradio Inference to interact with the trained models using a UI. Refer to our [guide](https://anomalib.readthedocs.io/en/latest/tutorials/inference.html#gradio-inference) for more details.
+You can also use Gradio Inference to interact with the trained models using a UI. Refer to
+our [guide](https://anomalib.readthedocs.io/en/latest/tutorials/inference.html#gradio-inference) for more details.
 
 ```bash
 # To get help about the arguments, run:
@@ -292,7 +319,8 @@ python tools/hpo/sweep.py \
     --sweep_config tools/hpo/sweep.yaml
 ```
 
-For more details refer the [HPO Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/hyperparameter_optimization.html)
+For more details refer
+the [HPO Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/hyperparameter_optimization.html)
 
 # Benchmarking
 
@@ -303,52 +331,64 @@ python tools/benchmarking/benchmark.py \
     --config <relative/absolute path>/<paramfile>.yaml
 ```
 
-Refer to the [Benchmarking Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/benchmarking.html) for more details.
+Refer to the [Benchmarking Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/benchmarking.html) for
+more details.
 
 # Experiment Management
 
-Anomalib is integrated with various libraries for experiment tracking such as Comet, tensorboard, and wandb through [pytorch lighting loggers](https://pytorch-lightning.readthedocs.io/en/stable/extensions/logging.html).
+Anomalib is integrated with various libraries for experiment tracking such as Comet, tensorboard, and wandb
+through [pytorch lighting loggers](https://pytorch-lightning.readthedocs.io/en/stable/extensions/logging.html).
 
-Below is an example of how to enable logging for hyper-parameters, metrics, model graphs, and predictions on images in the test data-set
+Below is an example of how to enable logging for hyper-parameters, metrics, model graphs, and predictions on images in
+the test data-set
 
 ```yaml
 visualization:
   log_images: True # log images to the available loggers (if any)
   mode: full # options: ["full", "simple"]
 
- logging:
-  logger: [comet, tensorboard, wandb]
-  log_graph: True
+  logging:
+    logger: [ comet, tensorboard, wandb ]
+    log_graph: True
 ```
 
-For more information, refer to the [Logging Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/logging.html)
+For more information, refer to
+the [Logging Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/logging.html)
 
-Note: Set your API Key for [Comet.ml](https://www.comet.com/signup?utm_source=anomalib&utm_medium=referral) via `comet_ml.init()` in interactive python or simply run `export COMET_API_KEY=<Your API Key>`
+Note: Set your API Key for [Comet.ml](https://www.comet.com/signup?utm_source=anomalib&utm_medium=referral)
+via `comet_ml.init()` in interactive python or simply run `export COMET_API_KEY=<Your API Key>`
 
 # Community Projects
 
 ## 1. Web-based Pipeline for Training and Inference
 
-This project showcases an end-to-end training and inference pipeline build on top of Anomalib. It provides a web-based UI for uploading MVTec style datasets and training them on the available Anomalib models. It also has sections for calling inference on individual images as well as listing all the images with their predictions in the database.
+This project showcases an end-to-end training and inference pipeline build on top of Anomalib. It provides a web-based
+UI for uploading MVTec style datasets and training them on the available Anomalib models. It also has sections for
+calling inference on individual images as well as listing all the images with their predictions in the database.
 
-You can view the project on [Github](https://github.com/vnk8071/anomaly-detection-in-industry-manufacturing/tree/master/anomalib_contribute)
+You can view the project
+on [Github](https://github.com/vnk8071/anomaly-detection-in-industry-manufacturing/tree/master/anomalib_contribute)
 For more details see the [Discussion forum](https://github.com/openvinotoolkit/anomalib/discussions/733)
 
 # Datasets
 
-`anomalib` supports MVTec AD [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) and BeanTech [(CC-BY-SA)](https://creativecommons.org/licenses/by-sa/4.0/legalcode) for benchmarking and `folder` for custom dataset training/inference.
+`anomalib` supports MVTec AD [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) and
+BeanTech [(CC-BY-SA)](https://creativecommons.org/licenses/by-sa/4.0/legalcode) for benchmarking and `folder` for custom
+dataset training/inference.
 
 ## [MVTec AD Dataset](https://www.mvtec.com/company/research/datasets/mvtec-ad)
 
 MVTec AD dataset is one of the main benchmarks for anomaly detection, and is released under the
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+License [(CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-> Note: These metrics are collected with image size of 256 and seed `42`. This common setting is used to make model comparisons fair.
+> Note: These metrics are collected with image size of 256 and seed `42`. This common setting is used to make model
+> comparisons fair.
 
 ## Image-Level AUC
 
 | Model           |                |    Avg    |  Carpet   |   Grid    |  Leather  |   Tile    |   Wood    |  Bottle   |   Cable   |  Capsule  | Hazelnut | Metal Nut |   Pill    |   Screw   | Toothbrush | Transistor |  Zipper   |
-| --------------- | -------------- | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :------: | :-------: | :-------: | :-------: | :--------: | :--------: | :-------: |
+|-----------------|----------------|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:--------:|:---------:|:---------:|:---------:|:----------:|:----------:|:---------:|
 | **EfficientAd** | **PDN-S**      | **0.982** |   0.982   | **1.000** |   0.997   | **1.000** |   0.986   | **1.000** |   0.952   |   0.950   |  0.952   |   0.979   | **0.987** |   0.960   |   0.997    |   0.999    | **0.994** |
 | EfficientAd     | PDN-M          |   0.975   |   0.972   |   0.998   | **1.000** |   0.999   |   0.984   |   0.991   |   0.945   |   0.957   |  0.948   |   0.989   |   0.926   | **0.975** | **1.000**  |   0.965    |   0.971   |
 | PatchCore       | Wide ResNet-50 |   0.980   |   0.984   |   0.959   |   1.000   | **1.000** |   0.989   |   1.000   | **0.990** | **0.982** |  1.000   |   0.994   |   0.924   |   0.960   |   0.933    | **1.000**  |   0.982   |
@@ -369,7 +409,7 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License 
 ## Pixel-Level AUC
 
 | Model       |                    |    Avg    |  Carpet   |   Grid    |  Leather  |   Tile    |   Wood    |  Bottle   |   Cable   |  Capsule  | Hazelnut  | Metal Nut |   Pill    |   Screw   | Toothbrush | Transistor |  Zipper   |
-| ----------- | ------------------ | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :--------: | :--------: | :-------: |
+|-------------|--------------------|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:----------:|:----------:|:---------:|
 | **CFA**     | **Wide ResNet-50** | **0.983** |   0.980   |   0.954   |   0.989   | **0.985** | **0.974** | **0.989** | **0.988** | **0.989** |   0.985   | **0.992** | **0.988** |   0.979   | **0.991**  |   0.977    | **0.990** |
 | CFA         | ResNet-18          |   0.979   |   0.970   |   0.973   |   0.992   |   0.978   |   0.964   |   0.986   |   0.984   |   0.987   |   0.987   |   0.981   |   0.981   |   0.973   |   0.990    |   0.964    |   0.978   |
 | PatchCore   | Wide ResNet-50     |   0.980   |   0.988   |   0.968   |   0.991   |   0.961   |   0.934   |   0.984   | **0.988** |   0.988   |   0.987   |   0.989   |   0.980   | **0.989** |   0.988    | **0.981**  |   0.983   |
@@ -385,7 +425,7 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License 
 ## Image F1 Score
 
 | Model         |                    |    Avg    |  Carpet   |   Grid    |  Leather  |   Tile    |   Wood    |  Bottle   |   Cable   |  Capsule  | Hazelnut  | Metal Nut |   Pill    |   Screw   | Toothbrush | Transistor |  Zipper   |
-| ------------- | ------------------ | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: | :--------: | :--------: | :-------: |
+|---------------|--------------------|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:----------:|:----------:|:---------:|
 | **PatchCore** | **Wide ResNet-50** | **0.976** |   0.971   |   0.974   | **1.000** | **1.000** |   0.967   | **1.000** |   0.968   | **0.982** | **1.000** |   0.984   |   0.940   |   0.943   |   0.938    | **1.000**  | **0.979** |
 | PatchCore     | ResNet-18          |   0.970   |   0.949   |   0.946   | **1.000** |   0.98    |   0.992   | **1.000** | **0.978** |   0.969   | **1.000** | **0.989** |   0.940   |   0.932   |   0.935    |   0.974    |   0.967   |
 | EfficientAd   | PDN-S              |   0.970   |   0.966   | **1.000** |   0.995   | **1.000** |   0.975   | **1.000** |   0.907   |   0.956   |   0.897   |   0.978   |   0.982   |   0.944   |   0.984    |   0.988    |   0.983   |
