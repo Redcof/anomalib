@@ -421,7 +421,7 @@ if __name__ == '__main__':
     parser.add_argument('--sixray_dir', '-sixray', default=r"/data/Sixray_easy", help='Path to SIXray dataset.')
     parser.add_argument('--anomaly_classes', '-an', default=("gun",), help='Anomaly classes', nargs='+', required=True)
     parser.add_argument('--combine_hif', '-com', action='store_true', default=False,
-                        help='Combine hif')
+                        help='Combine hif data with final dataset')
     parser.add_argument('--hif_dir', '-hif', default=r"/data/bags_sd3", help="Path to HIF dir")
     parser.add_argument('--hif_xml_dir', '-xml', default=None, help="Path to XML dir")
     parser.add_argument('--drop_hif_percent', default=30,
