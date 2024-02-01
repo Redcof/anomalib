@@ -79,7 +79,7 @@ def export(hif_path, save_path):
     return len(views_matlum)
 
 
-def export_sd3_hif_form_dir(hif_path, img_export_path, remove_before_export=False):
+def export_hif_form_dir(hif_path, img_export_path, remove_before_export=False):
     """
     Read all HIF files available in a directory and save each view as JPEG image in a given export directory as
     the following formal: HIF_NAME.hif-<view_index>.jpg,
@@ -122,7 +122,7 @@ def copy_files(src, files, dest, delete_at_source=False, overwrite=False):
         if os.path.exists(os.path.join(dest, file)) and not overwrite:
             continue
         # `src` needs it to be a file
-        if os.path.isfile(os.path.join(src, file)):
+        if os.path.isfile(os.path.join(src, file)) and not os.path.isfile(os.path.join(dest, file)):
             shutil.copyfile(os.path.join(src, file), os.path.join(dest, file))  # copy
             if delete_at_source:
                 os.remove(os.path.join(src, file))  # remove copied
@@ -133,7 +133,7 @@ def move_files(src, files, dest):
     copy_files(src, files, dest, delete_at_source=True)
 
 
-def split_exported_sd3_hif(src, portion=.8, discard=.0):
+def split_exported_hif(src, portion=.8, discard=.0):
     """
     This will create `train` and `test` directory and move images to two directories while following
     the portion given.
@@ -388,22 +388,32 @@ def copy_sixray_folder_split(sixray_path, anomaly_dataset_path, anomaly_classes,
         generate_mask_img(xml_test, sixray_test_files, mask_dir)
 
 
-def clean_before_copy(anomaly_dataset_path):
+def clean_before_copy(anomaly_data_path):
     """Delete the anomaly dataset directory"""
-    dataset_path = pathlib.Path(anomaly_dataset_path)
+    dataset_path = pathlib.Path(anomaly_data_path)
     shutil.rmtree(dataset_path, ignore_errors=True)
 
 
-def copy_sd3_dataset(sd3_path, anomaly_dataset_path):
+def copy_normal_hif_dataset(hif_dir, anomaly_data_path):
     """copy hif exported images to anomaly dataset."""
-    sd3 = pathlib.Path(sd3_path)
-    anomaly = pathlib.Path(anomaly_dataset_path)
-    dest_train = anomaly / "train" / "0.normal"
-    dest_test = anomaly / "test" / "0.normal"
-    src_train = sd3 / "train"
-    src_test = sd3 / "test"
-    print("Copy SD3 data to anomaly dataset")
+    hif_path = pathlib.Path(hif_dir)
+    anomaly = pathlib.Path(anomaly_data_path)
+    dest_train = anomaly / "train" / "normal"
+    dest_test = anomaly / "test" / "normal"
+    src_train = hif_path / "train"
+    src_test = hif_path / "test"
+    print("Copying HIF data to anomaly dataset-normal")
     copy_files(src_train, os.listdir(src_train), dest_train)
+    copy_files(src_test, os.listdir(src_test), dest_test)
+
+
+def copy_abnormal_hif_dataset(hif_dir, anomaly_data_path):
+    """copy hif exported images to anomaly dataset."""
+    hif_path = pathlib.Path(hif_dir)
+    anomaly = pathlib.Path(anomaly_data_path)
+    dest_test = anomaly / "test" / "abnormal"
+    src_test = hif_path
+    print("Copying HIF data to anomaly dataset-abnormal")
     copy_files(src_test, os.listdir(src_test), dest_test)
 
 
@@ -422,33 +432,41 @@ if __name__ == '__main__':
     parser.add_argument('--anomaly_classes', '-an', default=("gun",), help='Anomaly classes', nargs='+', required=True)
     parser.add_argument('--combine_hif', '-com', action='store_true', default=False,
                         help='Combine hif data with final dataset')
-    parser.add_argument('--hif_dir', '-hif', default=r"/data/bags_sd3", help="Path to HIF dir")
-    parser.add_argument('--hif_xml_dir', '-xml', default=None, help="Path to XML dir")
+    parser.add_argument('--hif_dir_normal', '-hif', default=r"/data/bags_sd3", help="Path to HIF dir")
+    parser.add_argument('--hif_dir_abnormal', '-hifan', default=r"/data/bags_sd3", help="Path to HIF dir")
     parser.add_argument('--drop_hif_percent', default=30,
                         help="Percent of HIF files to ignore while preparing the dataset")
     
     opt = parser.parse_args()
     
-    sd3_hif_path = opt.hif_dir  # r"/data/bags_sd3"
+    normal_hif_dir = opt.hif_dir_normal  # r"/data/bags_sd3"
+    normal_hif_img_export_path = os.path.join(normal_hif_dir, "exported")
+    abnormal_hif_dir = opt.hif_dir_abnormal  # r"/data/bags_sd3"
+    abnormal_hif_img_export_path = os.path.join(abnormal_hif_dir, "exported")
+    
     sixray_path = opt.sixray_dir  # r"/data/Sixray_easy"
-    sixray_sd3_anomaly_dataset = opt.export_dir  # r"/data/sixray_sd3_anomaly"
+    anomaly_dataset_path = opt.export_dir  # r"/data/sixray_sd3_anomaly"
     # sd3_hif_path = r"C:\Users\dndlssardar\OneDrive - Smiths Group\Documents\Projects\annox\example_images"
     # sixray_path = r"C:\Users\dndlssardar\OneDrive - Smiths Group\Documents\Projects\Dataset\Sixray_easy"
     # sixray_sd3_anomaly_dataset = r"C:\Users\dndlssardar\Documents\Projects\Dataset\Sixray_folder"
-    sd3_img_export_path = os.path.join(sd3_hif_path, "exported")
     all_sixray_classes = ("gun", "knife", "wrench", "pliers", "scissors", "hammer")
     sixray_anomaly_classes = tuple(opt.anomaly_classes)
     
     if opt.clean:
-        clean_before_copy(sixray_sd3_anomaly_dataset)
+        clean_before_copy(anomaly_dataset_path)
     if opt.combine_hif:
-        discard_sd3 = opt.drop_hif_percent / 100.  # 30%
-        export_sd3_hif_form_dir(sd3_hif_path, sd3_img_export_path, remove_before_export=True)
-        split_exported_sd3_hif(sd3_img_export_path, .8, discard=discard_sd3)
-        copy_sd3_dataset(sd3_img_export_path, sixray_sd3_anomaly_dataset)
-        copy_sixray_easy(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes)
+        discard_hif = opt.drop_hif_percent / 100.  # 30%
+        # normal hif
+        export_hif_form_dir(normal_hif_dir, normal_hif_img_export_path, remove_before_export=False)
+        split_exported_hif(normal_hif_img_export_path, .8, discard=discard_hif)
+        copy_normal_hif_dataset(normal_hif_img_export_path, anomaly_dataset_path)
+        # abnormal hif
+        export_hif_form_dir(abnormal_hif_dir, abnormal_hif_img_export_path, remove_before_export=False)
+        copy_abnormal_hif_dataset(abnormal_hif_img_export_path, anomaly_dataset_path)
+        
+        # copy_sixray_easy(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes)
     elif opt.sixray_only:
-        copy_sixray_folder_split(sixray_path, sixray_sd3_anomaly_dataset, sixray_anomaly_classes,
+        copy_sixray_folder_split(sixray_path, anomaly_dataset_path, sixray_anomaly_classes,
                                  opt.ablation,
                                  generate_mask=opt.generate_mask)
     print("Process completed.")
