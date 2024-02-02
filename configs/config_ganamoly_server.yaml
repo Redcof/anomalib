@@ -24,16 +24,24 @@ dataset:
   val_split_mode: same_as_test # options: [same_as_test, from_test, synthetic]
   val_split_ratio: 0.5 # fraction of train/test images held out for validation (usage depends on val_split_mode)
 
+
 model:
-  name: efficient_ad
-  teacher_out_channels: 384
-  model_size: small # options: [small, medium]
-  lr: 0.0001
-  weight_decay: 0.00001
-  padding: false
-  pad_maps: true # relevant for "padding: false", see EfficientAd in lightning_model.py
-  # generic params
-  normalization_method: min_max # options: [null, min_max, cdf]
+  name: ganomaly
+  latent_vec_size: 100
+  n_features: 64
+  extra_layers: 0
+  add_final_conv: true
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  wadv: 1
+  wcon: 50
+  wenc: 1
+  normalization_method: none
+  early_stopping:
+    patience: 3
+    metric: image_AUROC
+    mode: max
 
 metrics:
   image:
@@ -55,12 +63,12 @@ visualization:
   mode: full # options: ["full", "simple"]
 
 project:
-  seed: 42
+  seed: 47
   path: ./results
 
 logging:
-  logger: [tensorboard] # options: [comet, tensorboard, wandb, csv] or combinations.
-  log_graph: false # Logs the model graph to respective logger.
+  logger: [csv, tensorboard ] # options: [comet, tensorboard, wandb, csv] or combinations.
+  log_graph: true # Logs the model graph to respective logger.
 
 optimization:
   export_mode: torch # options: torch, onnx, openvino
@@ -78,9 +86,9 @@ trainer:
   check_val_every_n_epoch: 1 # Don't validate before extracting features.
   fast_dev_run: false
   accumulate_grad_batches: 1
-  max_epochs: 200
-  min_epochs: 200
-  max_steps: 50000 # this is a mandatory field. keep it very big
+  max_epochs: 100
+  min_epochs: 100
+  max_steps: -1
   min_steps: null
   max_time: null
   limit_train_batches: 1.0
@@ -89,8 +97,8 @@ trainer:
   limit_predict_batches: 1.0
   val_check_interval: 1.0 # Don't validate before extracting features.
   log_every_n_steps: 2
-  accelerator: gpu # <"cpu", "gpu", "tpu", "ipu", "hpu", "auto">
-  devices: "1" # auto, <number: accelerator count>
+  accelerator: auto # <"cpu", "gpu", "tpu", "ipu", "hpu", "auto">
+  devices: "0" # auto, <number: accelerator count, string: gpu-id>
   num_nodes: 1
   strategy: auto
   sync_batchnorm: false
