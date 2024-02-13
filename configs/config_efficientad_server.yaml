@@ -1,9 +1,9 @@
 dataset:
-  name: smiths_hif
+  name: smiths_hif_sixray
   format: folder
-  path: /data/smiths_hif_anomaly_data
-  normal_dir: normal
-  abnormal_dir: abnormal
+  path: /data/sixray_all_hif
+  normal_dir: sd3_hif
+  abnormal_dir: sixray
   normal_test_dir: null
   extensions: null
   task: classification
