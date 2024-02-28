@@ -88,8 +88,8 @@ trainer:
   check_val_every_n_epoch: 1 # Don't validate before extracting features.
   fast_dev_run: false
   accumulate_grad_batches: 1
-  max_epochs: 100
-  min_epochs: 100
+  max_epochs: 10
+  min_epochs: 10
   max_steps: -1
   min_steps: null
   max_time: null
